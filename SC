@@ -1,6 +1,5 @@
 import numpy as np
 
-
 print("---- Dhimas Hibban Athallah - 21120122140162 ----")
 print("--------------- Metode NUmerik B ----------------")
 
@@ -111,23 +110,13 @@ def input_vektor(n):
     vektor = list(map(float, input().split()))
     return np.array(vektor)
 
-# Input ukuran matriks
+A = input_matriks(n)
+b = input_vektor(n)
 n = int(input("Masukkan ukuran jumlah variabel matriks: "))
 
-# Input matriks A
-A = input_matriks(n)
-
-# Input vektor b
-b = input_vektor(n)
-
-# Metode matriks balikan
 x_matriks_balikan = metode_matriks_balikan(A, b)
 print("Solusi menggunakan metode matriks balikan:", x_matriks_balikan)
-
-# Metode dekomposisi LU Gauss
 x_LU_Gauss = metode_dekomposisi_LU_Gauss(A, b)
 print("Solusi menggunakan metode dekomposisi LU Gauss:", x_LU_Gauss)
-
-# Metode dekomposisi Crout
 x_Crout = metode_dekomposisi_Crout(A, b)
 print("Solusi menggunakan metode dekomposisi Crout:", x_Crout)
