@@ -1,0 +1,133 @@
+import numpy as np
+
+
+print("---- Dhimas Hibban Athallah - 21120122140162 ----")
+print("--------------- Metode NUmerik B ----------------")
+
+def metode_matriks_balikan(A, b):
+    try:
+        A_inv = np.linalg.inv(A)
+        x = np.dot(A_inv, b)
+        return x
+    except np.linalg.LinAlgError:
+        print("Matriks tidak bisa diinvers")
+
+def metode_dekomposisi_LU_Gauss(A, b):
+    try:
+        LU, piv = dekomposisi_LU(A)
+        x = solusi_LU(LU, piv, b)
+        return x
+    except np.linalg.LinAlgError:
+        print("Matriks tidak dapat didekomposisi")
+
+def metode_dekomposisi_Crout(A, b):
+    n = len(A)
+    L, U = dekomposisi_Crout(A)
+    y = forward_substitution(L, b)
+    x = backward_substitution(U, y)
+    return x
+
+def dekomposisi_LU(A):
+    n = len(A)
+    LU = np.copy(A)
+    piv = np.arange(n)
+    for k in range(n-1):
+        max_index = np.argmax(np.abs(LU[k:, k])) + k
+        if max_index != k:
+            LU[[k, max_index]] = LU[[max_index, k]]
+            piv[[k, max_index]] = piv[[max_index, k]]
+        for i in range(k+1, n):
+            LU[i, k] /= LU[k, k]
+            for j in range(k+1, n):
+                LU[i, j] -= LU[i, k] * LU[k, j]
+    return LU, piv
+
+def solusi_LU(LU, piv, b):
+    n = len(LU)
+    x = np.zeros_like(b)
+    for i in range(n):
+        x[i] = b[piv[i]]
+        for j in range(i):
+            x[i] -= LU[i, j] * x[j]
+    for i in range(n-1, -1, -1):
+        for j in range(i+1, n):
+            x[i] -= LU[i, j] * x[j]
+        x[i] /= LU[i, i]
+    return x
+
+def dekomposisi_Crout(A):
+    n = len(A)
+    L = np.zeros((n, n))
+    U = np.zeros((n, n))
+    for j in range(n):
+        U[0][j] = A[0][j]
+    for i in range(n):
+        L[i][i] = 1
+        L[i][0] = A[i][0] / U[0][0]
+    for i in range(1, n):
+        for j in range(i, n):
+            s = 0
+            for k in range(i):
+                s += L[i][k] * U[k][j]
+            U[i][j] = A[i][j] - s
+        for j in range(i+1, n):
+            s = 0
+            for k in range(i):
+                s += L[j][k] * U[k][i]
+            L[j][i] = (A[j][i] - s) / U[i][i]
+    return L, U
+
+def forward_substitution(L, b):
+    n = len(b)
+    y = np.zeros_like(b)
+    y[0] = b[0]
+    for i in range(1, n):
+        y[i] = b[i]
+        for j in range(i):
+            y[i] -= L[i][j] * y[j]
+    return y
+
+def backward_substitution(U, y):
+    n = len(y)
+    x = np.zeros_like(y)
+    x[-1] = y[-1] / U[-1][-1]
+    for i in range(n-2, -1, -1):
+        x[i] = y[i]
+        for j in range(i+1, n):
+            x[i] -= U[i][j] * x[j]
+        x[i] /= U[i][i]
+    return x
+
+def input_matriks(n):
+    print(f"Masukkan elemen matriks {n}x{n}:")
+    matriks = []
+    for i in range(n):
+        row = list(map(float, input().split()))
+        matriks.append(row)
+    return np.array(matriks)
+
+def input_vektor(n):
+    print("Masukkan elemen vektor:")
+    vektor = list(map(float, input().split()))
+    return np.array(vektor)
+
+# Input ukuran matriks
+n = int(input("Masukkan ukuran jumlah variabel matriks: "))
+
+# Input matriks A
+A = input_matriks(n)
+
+# Input vektor b
+b = input_vektor(n)
+
+# Metode matriks balikan
+x_matriks_balikan = metode_matriks_balikan(A, b)
+print("Solusi menggunakan metode matriks balikan:", x_matriks_balikan)
+
+# Metode dekomposisi LU Gauss
+x_LU_Gauss = metode_dekomposisi_LU_Gauss(A, b)
+print("Solusi menggunakan metode dekomposisi LU Gauss:", x_LU_Gauss)
+
+# Metode dekomposisi Crout
+x_Crout = metode_dekomposisi_Crout(A, b)
+print("Solusi menggunakan metode dekomposisi Crout:", x_Crout)
